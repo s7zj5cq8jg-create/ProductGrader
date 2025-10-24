@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProductGrader — Results</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <div class="site-header">
+    <img src="logo.png" alt="ProductGrader Logo" class="site-logo" />
+    <h1 class="site-title">ProductGrader</h1>
+  </div>
+
+  <!-- Results App Wrapper (for script.js detection) -->
+  <div id="resultsApp">
+    <div id="resultBox" class="result-box"></div>
+  </div>
+
+  <!-- Main Logic Script -->
+  <script>
+    // =========================
+    // DATABASE — SAMPLE PRODUCTS
+    // =========================
+    const products = {
+  // === Original & Early Models ===
+  "iphone": {
+    grade: "C",
+    price: "$499",
+    stars: 2,
+    summary: "The original iPhone — revolutionary for its time, limited by 2G and storage."
+  },
+  "iphone 3g": {
+    grade: "C+",
+    price: "$599",
+    stars: 2,
+    summary: "Added App Store and 3G; slow by modern standards but iconic."
+  },
+  "iphone 3gs": {
+    grade: "B-",
+    price: "$599",
+    stars: 3,
+    summary: "Faster and smoother with video recording; still small and dated today."
+  },
+
+  // === iPhone 4 Series ===
+  "iphone 4": {
+    grade: "B",
+    price: "$649",
+    stars: 3,
+    summary: "Retina Display debut; glass design made it a design icon but fragile."
+  },
+  "iphone 4s": {
+    grade: "B+",
+    price: "$649",
+    stars: 3,
+    summary: "Introduced Siri and better performance; aging hardware today."
+  },
+
+  // === iPhone 5 Series ===
+  "iphone 5": {
+    grade: "B",
+    price: "$649",
+    stars: 3,
+    summary: "Lighter aluminum body; first Lightning port model."
+  },
+  "iphone 5c": {
+    grade: "B-",
+    price: "$549",
+    stars: 2,
+    summary: "Plastic shell and bright colors; affordable but less premium."
+  },
+  "iphone 5s": {
+    grade: "B+",
+    price: "$649",
+    stars: 3,
+    summary: "Touch ID debut; sleek and powerful for its time."
+  },
+
+  // === iPhone 6 Series ===
+  "iphone 6": {
+    grade: "B+",
+    price: "$649",
+    stars: 3,
+    summary: "Larger screen, thin design, but bend-gate concerns."
+  },
+  "iphone 6 plus": {
+    grade: "B",
+    price: "$749",
+    stars: 3,
+    summary: "First true big-screen iPhone; great media phone but fragile."
+  },
+  "iphone 6s": {
+    grade: "A-",
+    price: "$649",
+    stars: 4,
+    summary: "3D Touch and better build; solid reliability and performance."
+  },
+  "iphone 6s plus": {
+    grade: "A-",
+    price: "$749",
+    stars: 4,
+    summary: "Improved battery life and camera; still a fan favorite."
+  },
+
+  // === iPhone 7 Series ===
+  "iphone 7": {
+    grade: "A-",
+    price: "$649",
+    stars: 4,
+    summary: "Water resistance and stereo speakers; removed headphone jack."
+  },
+  "iphone 7 plus": {
+    grade: "A",
+    price: "$769",
+    stars: 4,
+    summary: "Dual-camera system and great battery; a major step up."
+  },
+
+  // === iPhone 8 Series ===
+  "iphone 8": {
+    grade: "A-",
+    price: "$699",
+    stars: 4,
+    summary: "Wireless charging introduced; classic design refined."
+  },
+  "iphone 8 plus": {
+    grade: "A",
+    price: "$799",
+    stars: 4,
+    summary: "Bigger screen, wireless charging, and solid longevity."
+  },
+
+  // === iPhone X / XS / XR Series ===
+  "iphone x": {
+    grade: "A",
+    price: "$999",
+    stars: 4,
+    summary: "OLED, Face ID, and modern design revolutionized the iPhone line."
+  },
+  "iphone xr": {
+    grade: "A-",
+    price: "$749",
+    stars: 4,
+    summary: "Colorful and affordable with excellent battery life."
+  },
+  "iphone xs": {
+    grade: "A",
+    price: "$999",
+    stars: 4,
+    summary: "Premium stainless steel and dual cameras; a refined X."
+  },
+  "iphone xs max": {
+    grade: "A",
+    price: "$1099",
+    stars: 4,
+    summary: "Huge OLED display and premium feel; great media phone."
+  },
+
+  // === iPhone 11 Series ===
+  "iphone 11": {
+    grade: "A",
+    price: "$699",
+    stars: 4,
+    summary: "Great value flagship with dual cameras and A13 chip."
+  },
+  "iphone 11 pro": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "Premium build, triple camera, and incredible performance."
+  },
+  "iphone 11 pro max": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Top battery life and huge display; best of its generation."
+  },
+
+  // === iPhone 12 Series ===
+  "iphone 12": {
+    grade: "A-",
+    price: "$799",
+    stars: 4,
+    summary: "5G support, MagSafe, and sleek flat-edge design."
+  },
+  "iphone 12 mini": {
+    grade: "B+",
+    price: "$699",
+    stars: 3,
+    summary: "Compact and capable; limited battery life."
+  },
+  "iphone 12 pro": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "Pro camera system and LiDAR for advanced AR and photography."
+  },
+  "iphone 12 pro max": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Exceptional camera and battery in a massive display."
+  },
+
+  // === iPhone 13 Series ===
+  "iphone 13": {
+    grade: "A",
+    price: "$799",
+    stars: 4,
+    summary: "Improved cameras, battery, and chip; great balance overall."
+  },
+  "iphone 13 mini": {
+    grade: "B+",
+    price: "$699",
+    stars: 3,
+    summary: "Small but strong; ideal for compact phone lovers."
+  },
+  "iphone 13 pro": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "ProMotion and refined camera system; nearly perfect balance."
+  },
+  "iphone 13 pro max": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Huge screen, long battery life, and elite camera performance."
+  },
+
+  // === iPhone 14 Series ===
+  "iphone 14": {
+    grade: "A",
+    price: "$799",
+    stars: 4,
+    summary: "Crash detection and satellite SOS make it smarter than before."
+  },
+  "iphone 14 plus": {
+    grade: "A",
+    price: "$899",
+    stars: 4,
+    summary: "Large display and battery life; excellent for streaming."
+  },
+  "iphone 14 pro": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "Dynamic Island and Always-On Display redefine usability."
+  },
+  "iphone 14 pro max": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Superb performance, battery, and camera; premium flagship."
+  },
+
+  // === iPhone 15 Series ===
+  "iphone 15": {
+    grade: "A",
+    price: "$799",
+    stars: 4,
+    summary: "USB-C, lighter body, and improved camera quality."
+  },
+  "iphone 15 plus": {
+    grade: "A",
+    price: "$899",
+    stars: 4,
+    summary: "Big battery and display with modern features."
+  },
+  "iphone 15 pro": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "Titanium frame and A17 Pro chip bring premium performance."
+  },
+  "iphone 15 pro max": {
+    grade: "A+",
+    price: "$1199",
+    stars: 5,
+    summary: "Ultimate model with advanced zoom and top-tier display."
+  },
+
+  // === iPhone 16 Series ===
+  "iphone 16": {
+    grade: "A",
+    price: "$899",
+    stars: 4,
+    summary: "Excellent all-rounder with refined design and better battery."
+  },
+  "iphone 16 plus": {
+    grade: "A",
+    price: "$999",
+    stars: 4,
+    summary: "Bigger display, more battery, and modern power efficiency."
+  },
+  "iphone 16 pro": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Next-gen A18 chip and advanced optics define this generation."
+  },
+  "iphone 16 pro max": {
+    grade: "A+",
+    price: "$1199",
+    stars: 5,
+    summary: "Top-of-the-line performance and display quality; best of the best."
+  },
+  "iphone 16 ultra": {
+    grade: "A+",
+    price: "$1299",
+    stars: 5,
+    summary: "Titanium body, boosted cameras, and record battery life."
+  },
+
+  // === iPhone 17 Series ===
+  "iphone 17": {
+    grade: "A+",
+    price: "$899",
+    stars: 5,
+    summary: "AI-driven features and adaptive battery make it ultra-efficient."
+  },
+  "iphone 17 plus": {
+    grade: "A+",
+    price: "$999",
+    stars: 5,
+    summary: "Massive display and camera enhancements; perfect for creators."
+  },
+  "iphone 17 pro": {
+    grade: "A+",
+    price: "$1099",
+    stars: 5,
+    summary: "Cutting-edge design, AR focus, and unmatched speed."
+  },
+  "iphone 17 pro max": {
+    grade: "A+",
+    price: "$1199",
+    stars: 5,
+    summary: "Flagship perfection — power, endurance, and innovation combined."
+  }
+};
+
+    // ===============================
+// 🔍 SYNONYMS MAP (Smart Matching)
+// ===============================
+const synonyms = {
+  // === General ===
+  "iphone": "iphone",
+  "iphones": "iphone",
+
+  // === Early Models ===
+  "iphone1": "iphone",
+  "iphone2g": "iphone",
+  "iphone3g": "iphone 3g",
+  "iphone3gs": "iphone 3gs",
+
+  // === 4 Series ===
+  "iphone4": "iphone 4",
+  "iphone4s": "iphone 4s",
+
+  // === 5 Series ===
+  "iphone5": "iphone 5",
+  "iphone5c": "iphone 5c",
+  "iphone5s": "iphone 5s",
+
+  // === 6 Series ===
+  "iphone6": "iphone 6",
+  "iphone6plus": "iphone 6 plus",
+  "iphone6s": "iphone 6s",
+  "iphone6splus": "iphone 6s plus",
+
+  // === 7 Series ===
+  "iphone7": "iphone 7",
+  "iphone7plus": "iphone 7 plus",
+
+  // === 8 Series ===
+  "iphone8": "iphone 8",
+  "iphone8plus": "iphone 8 plus",
+
+  // === X Series ===
+  "iphonex": "iphone x",
+  "iphonexr": "iphone xr",
+  "iphonexs": "iphone xs",
+  "iphonexsmax": "iphone xs max",
+
+  // === 11 Series ===
+  "iphone11": "iphone 11",
+  "iphone11pro": "iphone 11 pro",
+  "iphone11promax": "iphone 11 pro max",
+
+  // === 12 Series ===
+  "iphone12": "iphone 12",
+  "iphone12mini": "iphone 12 mini",
+  "iphone12pro": "iphone 12 pro",
+  "iphone12promax": "iphone 12 pro max",
+
+  // === 13 Series ===
+  "iphone13": "iphone 13",
+  "iphone13mini": "iphone 13 mini",
+  "iphone13pro": "iphone 13 pro",
+  "iphone13promax": "iphone 13 pro max",
+
+  // === 14 Series ===
+  "iphone14": "iphone 14",
+  "iphone14plus": "iphone 14 plus",
+  "iphone14pro": "iphone 14 pro",
+  "iphone14promax": "iphone 14 pro max",
+
+  // === 15 Series ===
+  "iphone15": "iphone 15",
+  "iphone15plus": "iphone 15 plus",
+  "iphone15pro": "iphone 15 pro",
+  "iphone15promax": "iphone 15 pro max",
+
+  // === 16 Series ===
+  "iphone16": "iphone 16",
+  "iphone16plus": "iphone 16 plus",
+  "iphone16pro": "iphone 16 pro",
+  "iphone16promax": "iphone 16 pro max",
+  "iphone16ultra": "iphone 16 ultra",
+
+  // === 17 Series ===
+  "iphone17": "iphone 17",
+  "iphone17plus": "iphone 17 plus",
+  "iphone17pro": "iphone 17 pro",
+  "iphone17promax": "iphone 17 pro max"
+};
+
+ // =========================
+    // SEARCH + DISPLAY LOGIC
+    // =========================
+    const params = new URLSearchParams(window.location.search);
+    const search = params.get("search");
+    const resultBox = document.getElementById("resultBox");
+
+    function findProduct(query) {
+      if (!query) return null;
+      const key = query.toLowerCase().trim();
+      if (products[key]) return products[key];
+      for (const k of Object.keys(products)) {
+        if (k.includes(key) || key.includes(k)) return products[k];
+      }
+      return null;
+    }
+
+    resultBox.innerHTML = "<p>Loading...</p>";
+
+    setTimeout(() => {
+      const product = findProduct(search);
+      if (product) {
+        const grade = product.grade.toUpperCase();
+        let gradeClass = "grade-f";
+        if (grade.startsWith("A+")) gradeClass = "grade-a-plus";
+        else if (grade.startsWith("A")) gradeClass = "grade-a";
+        else if (grade.startsWith("B")) gradeClass = "grade-b";
+        else if (grade.startsWith("C")) gradeClass = "grade-c";
+        else if (grade.startsWith("D")) gradeClass = "grade-d";
+
+        resultBox.innerHTML = `
+          <div class="grade-box ${gradeClass}">${grade}</div>
+          <div class="product-info">
+            <p><strong>Product:</strong> <span>${search}</span></p>
+            <p><strong>Price:</strong> <span>${product.price}</span></p>
+            <p><strong>Consumer Feedback:</strong> 
+              <span class="stars">${'★'.repeat(product.stars)}${'☆'.repeat(5 - product.stars)}</span>
+            </p>
+            <p><strong>Details:</strong> 
+              <span>${product.summary}</span>
+            </p>
+          </div>
+        `;
+      } else {
+        resultBox.innerHTML = `
+          <p>No results found for <b>${search}</b>.</p>
+          <p>Try searching another model like <b>iPhone 15 Pro</b> or <b>iPhone 12</b>.</p>
+        `;
+      }
+    }, 300);
+  </script>
+
+  <!-- 🏠 Home Button -->
+  <div class="home-btn-container">
+    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+  </div>
+ 
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div>© 2025 ProductGrader Prototype — Built by Cosmo Coughran.</div>
+      <div>This site is currently in beta for testing the ProductGrader system.</div>
+    </div>
+  </footer>
+</body>
+</html>
