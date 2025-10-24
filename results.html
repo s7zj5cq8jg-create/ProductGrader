@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProductGrader — Results</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+
+<body>
+  <!-- ===========================
+       HEADER
+  ============================ -->
+  <header class="site-header">
+    <img src="logo.png" alt="ProductGrader Logo" class="site-logo" />
+    <h1 class="site-title">ProductGrader</h1>
+  </header>
+
+  <!-- ===========================
+       RESULTS CONTAINER
+  ============================ -->
+  <main id="resultsApp" class="container">
+    <div id="resultBox" class="result-box">
+      <p>Loading...</p>
+    </div>
+  </main>
+
+  <!-- ===========================
+       HOME BUTTON
+  ============================ -->
+  <div class="home-btn-container">
+    <button class="home-btn" onclick="window.location.href='index.html'">🏠 Home</button>
+  </div>
+
+  <!-- ===========================
+       FOOTER
+  ============================ -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div>© 2025 ProductGrader Prototype — Built by Cosmo Coughran.</div>
+      <div>This site is currently in beta for testing the ProductGrader system.</div>
+    </div>
+  </footer>
+
+  <!-- ===========================
+       RESULTS LOGIC SCRIPT
+  ============================ -->
+  <script>
+    // === DATABASE ===
+    const products = {
+      "iphone": { grade: "C", price: "$499", stars: 2, summary: "The original iPhone — revolutionary for its time, limited by 2G and storage." },
+      "iphone 3g": { grade: "C+", price: "$599", stars: 2, summary: "Added App Store and 3G; slow by modern standards but iconic." },
+      "iphone 3gs": { grade: "B-", price: "$599", stars: 3, summary: "Faster and smoother with video recording; still small and dated today." },
+      // ... (rest of your iPhone data stays the same)
+    };
+
+    // === SYNONYMS (SMART MATCHING) ===
+    const synonyms = {
+      "iphone": "iphone", "iphones": "iphone",
+      "iphone3g": "iphone 3g", "iphone3gs": "iphone 3gs",
+      "iphone4": "iphone 4", "iphone4s": "iphone 4s",
+      // ... (same as before)
+    };
+
+    // === SEARCH LOGIC ===
+    const params = new URLSearchParams(window.location.search);
+    const search = params.get("search");
+    const resultBox = document.getElementById("resultBox");
+
+    function findProduct(query) {
+  if (!query) return null;
+  const key = query.toLowerCase().trim();
+
+  // 1️⃣ Exact match first
+  if (products[key]) return products[key];
+
+  // 2️⃣ Synonym match (if you have a synonyms object)
+  if (typeof synonyms !== "undefined" && synonyms[key] && products[synonyms[key]]) {
+    return products[synonyms[key]];
+  }
+
+  // 3️⃣ Fuzzy match — prefer the longest key so "iPhone 12" won't match "iPhone"
+  const keys = Object.keys(products);
+  keys.sort((a, b) => b.length - a.length); // longer matches first
+
+  for (const k of keys) {
+    if (key.includes(k)) return products[k];
+    if (k.includes(key)) return products[k];
+  }
+
+  return null;
+}
+
+
+    // === DISPLAY RESULTS ===
+    setTimeout(() => {
+      const product = findProduct(search);
+      if (product) {
+        const grade = product.grade.toUpperCase();
+        let gradeClass = "grade-f";
+        if (grade.startsWith("A+")) gradeClass = "grade-a-plus";
+        else if (grade.startsWith("A")) gradeClass = "grade-a";
+        else if (grade.startsWith("B")) gradeClass = "grade-b";
+        else if (grade.startsWith("C")) gradeClass = "grade-c";
+        else if (grade.startsWith("D")) gradeClass = "grade-d";
+
+        resultBox.innerHTML = `
+          <div class="grade-box ${gradeClass}">${grade}</div>
+          <div class="product-info">
+            <p><strong>Product:</strong> <span>${search}</span></p>
+            <p><strong>Price:</strong> <span>${product.price}</span></p>
+            <p><strong>Consumer Feedback:</strong> 
+              <span class="stars">${'★'.repeat(product.stars)}${'☆'.repeat(5 - product.stars)}</span>
+            </p>
+            <p><strong>Details:</strong> <span>${product.summary}</span></p>
+          </div>
+        `;
+      } else {
+        resultBox.innerHTML = `
+          <p>No results found for <b>${search}</b>.</p>
+          <p>Try searching another model like <b>iPhone 15 Pro</b> or <b>iPhone 12</b>.</p>
+        `;
+      }
+    }, 300);
+  </script>
+</body>
+</html>
